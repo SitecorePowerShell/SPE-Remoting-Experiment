@@ -5,22 +5,7 @@ VisualStudioVersion = 17.2.32616.157
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spe", "Spe\Spe.csproj", "{11D8E442-22FD-42A1-BC42-31D5730A2C20}"
 EndProject
-Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "pwsh", "..\..\..\Program Files\PowerShell\7\pwsh.exe", "{BB376660-3A08-4997-90AB-3B8A1713F3B1}"
-	ProjectSection(DebuggerProjectSystem) = preProject
-		PortSupplier = 00000000-0000-0000-0000-000000000000
-		Executable = C:\Program Files\PowerShell\7\pwsh.exe
-		RemoteMachine = MICHAEL-LAPTOP
-		StartingDirectory = C:\Projects\experiments\Spe\Spe\bin\Debug\net6.0
-		Arguments = -noexit -command "[reflection.assembly]::loadFrom('Spe.dll' ) | import-module"
-		Environment = Default
-		LaunchingEngine = 00000000-0000-0000-0000-000000000000
-		UseLegacyDebugEngines = No
-		LaunchSQLEngine = No
-		AttachLaunchAction = No
-		IORedirection = Auto
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spe.Host", "Spe.Host\Spe.Host.csproj", "{7D515C68-BB00-4E7A-90EB-E9396E773621}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spe.Host", "Spe.Host\Spe.Host.csproj", "{7D515C68-BB00-4E7A-90EB-E9396E773621}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,10 +23,6 @@ Global
 		{11D8E442-22FD-42A1-BC42-31D5730A2C20}.Release|Any CPU.Build.0 = Release|Any CPU
 		{11D8E442-22FD-42A1-BC42-31D5730A2C20}.Release|x64.ActiveCfg = Release|Any CPU
 		{11D8E442-22FD-42A1-BC42-31D5730A2C20}.Release|x64.Build.0 = Release|Any CPU
-		{BB376660-3A08-4997-90AB-3B8A1713F3B1}.Debug|Any CPU.ActiveCfg = Release|x64
-		{BB376660-3A08-4997-90AB-3B8A1713F3B1}.Debug|x64.ActiveCfg = Release|x64
-		{BB376660-3A08-4997-90AB-3B8A1713F3B1}.Release|Any CPU.ActiveCfg = Release|x64
-		{BB376660-3A08-4997-90AB-3B8A1713F3B1}.Release|x64.ActiveCfg = Release|x64
 		{7D515C68-BB00-4E7A-90EB-E9396E773621}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7D515C68-BB00-4E7A-90EB-E9396E773621}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D515C68-BB00-4E7A-90EB-E9396E773621}.Debug|x64.ActiveCfg = Debug|Any CPU

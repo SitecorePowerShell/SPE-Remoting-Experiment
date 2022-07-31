@@ -82,9 +82,9 @@ namespace Spe
                 content.Headers.ContentEncoding.Add("gzip");
 
                 var response = client.PostAsync(url, content);
-                var taskResult = response.Result;
+                var taskResult = response.GetAwaiter().GetResult();
                 taskResult.EnsureSuccessStatusCode();
-                results.Add(taskResult.Content.ReadAsStringAsync().Result);
+                results.Add(taskResult.Content.ReadAsStringAsync().GetAwaiter().GetResult());
             }
 
             return results;

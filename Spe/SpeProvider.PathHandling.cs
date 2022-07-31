@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Management.Automation;
 
 namespace Spe
@@ -40,7 +41,7 @@ namespace Spe
                     return (bool)items[0].ImmediateBaseObject;
                 }
             }
-            
+
             //log error
             return false;
         }
@@ -75,6 +76,48 @@ namespace Spe
         private PSObject? GetItemForPath(string path)
         {
             return InvokeAndParse($"Get-Item -Path {GetItemPath(path)}").FirstOrDefault();
+        }
+
+        private string NormalizePath(string path)
+        {
+            var normalizedPath = path;
+            if (string.IsNullOrEmpty(path)) return normalizedPath;
+
+            normalizedPath = path.Replace('/', '\\');
+            if (HasRelativePathTokens(path))
+            {
+                normalizedPath = NormalizeRelativePath(normalizedPath, null);
+            }
+            return normalizedPath;
+        }
+
+        private static bool HasRelativePathTokens(string path)
+        {
+            if ((path.IndexOf(@"\", StringComparison.OrdinalIgnoreCase) != 0) && !path.Contains(@"\.\") &&
+                 !path.Contains(@"\..\") && !path.EndsWith(@"\..", StringComparison.OrdinalIgnoreCase) &&
+                !path.EndsWith(@"\.", StringComparison.OrdinalIgnoreCase) &&
+                  !path.StartsWith(@"..\", StringComparison.OrdinalIgnoreCase) &&
+                 !path.StartsWith(@".\", StringComparison.OrdinalIgnoreCase))
+            {
+                return path.StartsWith("~", StringComparison.OrdinalIgnoreCase);
+            }
+            return true;
+        }
+
+        private static string GetParentFromPath(string path)
+        {
+            path = path.Replace('\\', '/').TrimEnd('/');
+            var lastLeafIndex = path.LastIndexOf('/');
+            return path.Substring(0, lastLeafIndex);
+        }
+
+        private static string GetLeafFromPath(string path)
+        {
+            if (string.IsNullOrEmpty(path)) return path;
+
+            path = path.Replace('\\', '/').TrimEnd('/');
+            var lastLeafIndex = path.LastIndexOf('/');
+            return path.Substring(lastLeafIndex + 1);
         }
     }
 }
