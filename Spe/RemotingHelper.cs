@@ -6,13 +6,14 @@ using System.IO;
 using System.Management.Automation;
 using System.Net.Http;
 using System.Reflection;
+using System.Text;
 using System.Xml;
 
 namespace Spe
 {
-    public partial class SpeProvider
+    internal class RemotingHelper
     {
-        private List<PSObject> DeserializeXml(string data)
+        private static List<PSObject> DeserializeXml(string data)
         {
             if (string.IsNullOrEmpty(data))
             {
@@ -39,14 +40,44 @@ namespace Spe
                 }
                 catch (Exception ex)
                 {
-                    WriteWarning("Could not deserialize string. Exception: " + ex.Message);
+                    throw;
+                    //WriteWarning("Could not deserialize string. Exception: " + ex.Message);
                 }
             }
 
             return results;
         }
-        
-        private static Collection<PSObject> InvokeScript(string script, bool isRaw)
+
+        private static string? SerializePSObject(PSObject? data)
+        {
+            if (data == null) return null;
+
+            const BindingFlags commonBindings = BindingFlags.NonPublic | BindingFlags.Instance;
+
+            var builder = new StringBuilder();
+            var settings = new XmlWriterSettings
+            {
+                CloseOutput = true,
+                Encoding = Encoding.UTF8,
+                Indent = false,
+                OmitXmlDeclaration = true
+            };
+            var xmlWriter = XmlWriter.Create(builder, settings);
+            var type = typeof(PSObject).Assembly.GetType("System.Management.Automation.Serializer");
+            var ctor = type.GetConstructor(commonBindings, null, new[] { typeof(XmlWriter) }, null);
+            var serializer = ctor.Invoke(new object[] { xmlWriter });
+            var method = type.GetMethod("Serialize", commonBindings, null, new[] { typeof(object) }, null);
+            var done = type.GetMethod("Done", commonBindings);
+
+            method.Invoke(serializer, new object[] { data });
+
+            done.Invoke(serializer, new object[] { });            
+            xmlWriter.Close();
+
+            return builder.ToString();
+        }
+
+        public static Collection<PSObject> InvokeScript(string script, PSObject? arguments, bool isRaw = false)
         {
             var results = new Collection<PSObject>();
 
@@ -66,11 +97,12 @@ namespace Spe
             serviceUrl += "sessionId=" + sessionId + "&rawOutput=" + isRaw + "&persistentSession=" + persistentSession;
 
             var url = uri.AbsoluteUri.TrimEnd('/') + serviceUrl;
-            var localParams = "";
+            var localParams = SerializePSObject(arguments);
+
             var body = $"{script}<#{sessionId}#>{localParams}";
 
             var messageBytes = System.Text.Encoding.UTF8.GetBytes(body);
-            using (var ms = new System.IO.MemoryStream())
+            using (var ms = new MemoryStream())
             using (var gzip = new System.IO.Compression.GZipStream(ms, System.IO.Compression.CompressionLevel.Fastest, true))
             {
                 gzip.Write(messageBytes, 0, messageBytes.Length);
@@ -90,11 +122,11 @@ namespace Spe
             return results;
         }
 
-        private List<PSObject> InvokeAndParse(string script)
+        public static List<PSObject> InvokeAndParse(string script, PSObject? arguments = null)
         {
             var results = new List<PSObject>();
 
-            var records = InvokeScript(script, false);
+            var records = InvokeScript(script, arguments, false);
             foreach (var record in records)
             {
                 if (record.ImmediateBaseObject is string && string.IsNullOrEmpty(record.ToString())) continue;
@@ -103,7 +135,7 @@ namespace Spe
                 foreach (var item in items)
                 {
                     if (item is null) continue;
-                    if(item is PSObject)
+                    if (item is PSObject)
                     {
                         results.Add((PSObject)item);
                     }
@@ -116,36 +148,5 @@ namespace Spe
 
             return results;
         }
-
-        private void WriteObject(PSObject item, string path)
-        {
-            if (item.TypeNames.Contains("Deserialized.System.Management.Automation.ErrorRecord"))
-            {
-                var errorRecord = new ErrorRecord(new Exception(item.Properties["Exception"].Value.ToString()), "", (ErrorCategory)Enum.Parse(typeof(ErrorCategory), item.Properties["ErrorCategory_Category"].Value.ToString()), null);
-                WriteError(errorRecord);
-            }
-            else if (item.TypeNames.Contains("Deserialized.System.Management.Automation.WarningRecord"))
-            {
-                WriteWarning(item.ToString());
-            }
-            else if (item.TypeNames.Contains("Deserialized.System.Management.Automation.InformationRecord"))
-            {
-                var informationRecord = new InformationRecord(item.ToString(), "Sitecore PowerShell");
-                WriteInformation(informationRecord);
-            }
-            else if (item.TypeNames.Contains("Deserialized.System.Management.Automation.DebugRecord"))
-            {
-                WriteDebug(item.ToString());
-            }
-            else if (item.TypeNames.Contains("Deserialized.System.Management.Automation.VerboseRecord"))
-            {
-                WriteVerbose(item.ToString());
-            }
-            else
-            {
-                WriteItemObject(item, path, true);
-            }
-        }
-
     }
 }

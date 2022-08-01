@@ -18,7 +18,7 @@ namespace Spe
             //TODO: Query list of drives
             var drives = new Collection<PSDriveInfo>();
 
-            var items = InvokeAndParse("Get-Database | Where-Object { $_.Name -ne 'filesystem' }");
+            var items = RemotingHelper.InvokeAndParse("Get-Database | Where-Object { $_.Name -ne 'filesystem' }");
 
             foreach (var item in items)
             {
