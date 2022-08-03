@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Types>
+  <Type>
+    <Name>Deserialized.Sitecore.Data.Items.Item</Name>
+    <Members>
+      <MemberSet>
+        <Name>PSStandardMembers</Name>
+        <Members>
+          <NoteProperty>
+            <Name>TargetTypeForDeserialization</Name>
+            <Value>Sitecore.Data.Items.Item</Value>
+          </NoteProperty>
+        </Members>
+      </MemberSet>
+    </Members>
+  </Type>
+  <Type>
+    <Name>Sitecore.Data.Items.Item</Name>
+    <Members>
+      <CodeProperty IsHidden="true">
+        <Name>SerializationData</Name>
+        <GetCodeReference>
+          <TypeName>Spe.Serialization.SerializationTypeConverter</TypeName>
+          <MethodName>GetSerializationData</MethodName>
+        </GetCodeReference>
+      </CodeProperty>
+    </Members>
+    <TypeConverter>
+      <TypeName>Spe.Serialization.SerializationTypeConverter</TypeName>
+    </TypeConverter>
+  </Type>
+  <Type>
+    <Name>Deserialized.Spe.Commands.Security.AccountIdentity</Name>
+    <Members>
+      <MemberSet>
+        <Name>PSStandardMembers</Name>
+        <Members>
+          <NoteProperty>
+            <Name>TargetTypeForDeserialization</Name>
+            <Value>Spe.Commands.Security.AccountIdentity</Value>
+          </NoteProperty>
+        </Members>
+      </MemberSet>
+    </Members>
+  </Type>
+  <Type>
+    <Name>Spe.Commands.Security.AccountIdentity</Name>
+    <Members>
+      <CodeProperty IsHidden="true">
+        <Name>SerializationData</Name>
+        <GetCodeReference>
+          <TypeName>Spe.Serialization.SerializationTypeConverter</TypeName>
+          <MethodName>GetSerializationData</MethodName>
+        </GetCodeReference>
+      </CodeProperty>
+    </Members>
+    <TypeConverter>
+      <TypeName>Spe.Serialization.SerializationTypeConverter</TypeName>
+    </TypeConverter>
+  </Type>
+</Types>

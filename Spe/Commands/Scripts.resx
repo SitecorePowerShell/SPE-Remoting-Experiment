@@ -170,7 +170,14 @@
     $sb = New-Object System.Text.StringBuilder
     $sb.AppendLine("function $($Name) {") &gt; $null
     $sb.AppendLine($paramBlock) &gt; $null
-    $sb.AppendLine("end { Invoke-RemoteScript -ScriptBlock { $($Name) @params } -ArgumentList `$PSBoundParameters }") &gt; $null
+    $sb.AppendLine("end { ") &gt; $null
+    $sb.AppendLine("if(`$PSBoundParameters.ContainsKey('Item')) {") &gt; $null
+    $sb.AppendLine("`$PSBoundParameters.Add('Id', `$Item.ID.ToString()) &gt; `$null") &gt; $null
+    $sb.AppendLine("`$PSBoundParameters.Add('Database', `$Item.Database.ToString()) &gt; `$null") &gt; $null
+    $sb.AppendLine("`$PSBoundParameters.Remove('Item') &gt; `$null") &gt; $null
+    $sb.AppendLine(" }") &gt; $null
+    $sb.AppendLine("Invoke-RemoteScript -ScriptBlock { $($Name) @params } -ArgumentList `$PSBoundParameters") &gt; $null
+    $sb.AppendLine(" }") &gt; $null
     $sb.AppendLine("}") &gt; $null
     
     $sb.ToString()

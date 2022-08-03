@@ -58,8 +58,8 @@ namespace Spe
         private string GetItemPath(string path)
         {
             var colonIndex = path.IndexOf(':');
-            var relativePath = path[(colonIndex + 1)..].Replace('\\', '/');
-            var databaseName = colonIndex < 0 ? PSDriveInfo.Name : path[..colonIndex];
+            var relativePath = path.Substring(colonIndex + 1).Replace('\\', '/');
+            var databaseName = colonIndex < 0 ? PSDriveInfo.Name : path.Substring(0, colonIndex);
 
             return $"{databaseName}:{relativePath}";
         }
@@ -68,7 +68,7 @@ namespace Spe
         {
             path = path.Replace('\\', '/').TrimEnd('/');
             var lastLeafIndex = path.LastIndexOf('/');
-            return path[..lastLeafIndex];
+            return path.Substring(0, lastLeafIndex);
         }
 
         private static string GetLeafFromPath(string path)
@@ -77,7 +77,7 @@ namespace Spe
 
             path = path.Replace('\\', '/').TrimEnd('/');
             var lastLeafIndex = path.LastIndexOf('/');
-            return path[(lastLeafIndex + 1)..];
+            return path.Substring(lastLeafIndex + 1);
         }
     }
 }

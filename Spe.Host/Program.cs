@@ -115,9 +115,9 @@
                 //    this.currentPowerShell.Commands = command;
                 //    this.currentPowerShell.Invoke();
                 //}
-
-                this.currentPowerShell.AddScript(@"import-module -name .\spe.dll; cd master:");
-                this.currentPowerShell.Invoke();
+                this.currentPowerShell.AddScript(@"Set-ExecutionPolicy RemoteSigned");
+                this.currentPowerShell.AddScript(@"Import-Module -Name .\spe.psd1 -verbose; cd master:");
+                var output = this.currentPowerShell.Invoke();
             }
             finally
             {

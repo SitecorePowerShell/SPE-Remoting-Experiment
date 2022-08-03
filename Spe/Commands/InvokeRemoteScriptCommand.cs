@@ -20,7 +20,7 @@ namespace Spe.Commands
 
         protected override void EndProcessing()
         {
-            PSObject? arguments = null;
+            PSObject arguments = null;
             if(ArgumentList != null)
             {
                 arguments = new PSObject(ArgumentList);

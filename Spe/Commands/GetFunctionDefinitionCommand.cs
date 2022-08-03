@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Spe.Commands
@@ -35,7 +36,9 @@ namespace Spe.Commands
             
             foreach (var item in items)
             {
-                WriteToStream(item, true);
+                var functionText = Regex.Replace(item.ToString(), @"\[[a-zA-Z]{1,50}[.][a-zA-Z.]{1,100}(\[\])?\]", "[PSObject]");
+
+                WriteToStream(functionText, true);
                 var results = base.InvokeCommand.InvokeScript(item.ToString());
                 foreach(var result in results)
                 {

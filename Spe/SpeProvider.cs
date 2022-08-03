@@ -64,7 +64,7 @@ namespace Spe
             var queue = new Queue();
             queue.Enqueue(path);
 
-            object? current;
+            object current;
             while (queue.Count > 0 && (current = queue.Dequeue()) != null)
             {
                 var currentPath = current.ToString();

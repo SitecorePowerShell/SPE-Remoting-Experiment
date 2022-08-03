@@ -27,28 +27,32 @@ namespace Spe
             var type = typeof(PSObject).Assembly.GetType("System.Management.Automation.Deserializer");
             var ctor = type.GetConstructor(commonBindings, null, new[] { typeof(XmlReader) }, null);
 
-            using var sr = new StringReader(data);
-            using var xr = new XmlTextReader(sr);
-            var deserializer = ctor.Invoke(new object[] { xr });
-            while (!(bool)type.InvokeMember("Done", methodBindings, null, deserializer, new object[] { }))
+            using (var sr = new StringReader(data))
             {
-                PSObject deserializedData = null;
-                try
+                using (var xr = new XmlTextReader(sr))
                 {
-                    deserializedData = (PSObject)type.InvokeMember("Deserialize", methodBindings, null, deserializer, Array.Empty<object>());
-                    results.Add(deserializedData);
+                    var deserializer = ctor.Invoke(new object[] { xr });
+                    while (!(bool)type.InvokeMember("Done", methodBindings, null, deserializer, new object[] { }))
+                    {
+                        PSObject deserializedData = null;
+                        try
+                        {
+                            deserializedData = (PSObject)type.InvokeMember("Deserialize", methodBindings, null, deserializer, Array.Empty<object>());
+                            results.Add(deserializedData);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw;
+                            //WriteWarning("Could not deserialize string. Exception: " + ex.Message);
+                        }
+                    }
                 }
-                catch (Exception ex)
-                {
-                    throw;
-                    //WriteWarning("Could not deserialize string. Exception: " + ex.Message);
-                }
-            }
+            }            
 
             return results;
         }
 
-        private static string? SerializePSObject(PSObject? data)
+        private static string SerializePSObject(PSObject data)
         {
             if (data == null) return null;
 
@@ -77,7 +81,7 @@ namespace Spe
             return builder.ToString();
         }
 
-        public static Collection<PSObject> InvokeScript(string script, PSObject? arguments, bool isRaw = false)
+        public static Collection<PSObject> InvokeScript(string script, PSObject arguments, bool isRaw = false)
         {
             var results = new Collection<PSObject>();
 
@@ -122,7 +126,7 @@ namespace Spe
             return results;
         }
 
-        public static List<PSObject> InvokeAndParse(string script, PSObject? arguments = null)
+        public static List<PSObject> InvokeAndParse(string script, PSObject arguments = null)
         {
             var results = new List<PSObject>();
 

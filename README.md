@@ -6,8 +6,6 @@ TODO:
 - Add support for detecting available commands/functions found in the running instance and make available locally.
 - Rehydrate objects with Type Converter
 
-$commandName = "Get-ItemTemplate"
-
 function Get-FunctionDefinition {
     param(
         [string]$Name
@@ -58,12 +56,15 @@ function Get-FunctionDefinition {
     $paramBlock = $astObjects | Select-Object -Property $text | Select-Object -Expand Code
     
     $sb = New-Object System.Text.StringBuilder
-    $sb.AppendLine("function Get-ItemTemplate {") > $null
+    $sb.AppendLine("function $($Name) {") > $null
     $sb.AppendLine($paramBlock) > $null
-    $sb.AppendLine("end { Invoke-RemoteScript -ScriptBlock { $($Name) @params } -ArgumentList $PSBoundParameters }") > $null
+    $sb.AppendLine("end { Invoke-RemoteScript -ScriptBlock { $($Name) @params } -ArgumentList `$PSBoundParameters }") > $null
     $sb.AppendLine("}") > $null
     
     $sb.ToString()
 }
 
-Get-FunctionDefinition -Name "Get-ItemTemplate"
+$excludeVerbs = @("Close", "Read", "Receive", "Send", "Show")
+$excludeNouns = @("ScriptSession")
+$commands = Get-Command | Where-Object { $_.ModuleName -eq "" -and $_.CommandType -eq "cmdlet" -and $excludeVerbs -notcontains $_.Verb -and $excludeNouns -notcontains $_.Noun } | Select-Object -Property Name
+$commands | ForEach-Object { Get-FunctionDefinition -Name $_.Name }
